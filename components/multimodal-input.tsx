@@ -29,6 +29,8 @@ import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { SuggestedActions } from './suggested-actions';
 import equal from 'fast-deep-equal';
+import { ModeSelector } from './mode-selector';
+import type { ModeType } from '@/lib/mode';
 
 function PureMultimodalInput({
   chatId,
@@ -43,6 +45,7 @@ function PureMultimodalInput({
   append,
   handleSubmit,
   className,
+  selectedModeType,
 }: {
   chatId: string;
   input: string;
@@ -64,6 +67,7 @@ function PureMultimodalInput({
     chatRequestOptions?: ChatRequestOptions,
   ) => void;
   className?: string;
+  selectedModeType: ModeType;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
@@ -254,8 +258,13 @@ function PureMultimodalInput({
         }}
       />
 
-      <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
+      <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start gap-1">
         <AttachmentsButton fileInputRef={fileInputRef} isLoading={isLoading} />
+        <ModeSelector
+          chatId={chatId}
+          selectedModeType={selectedModeType}
+          compact
+        />
       </div>
 
       <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">

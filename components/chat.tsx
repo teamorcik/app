@@ -12,20 +12,20 @@ import { fetcher } from '@/lib/utils';
 import { Block } from './block';
 import { MultimodalInput } from './multimodal-input';
 import { Messages } from './messages';
-import { VisibilityType } from './visibility-selector';
+import type { ModeType } from '@/lib/mode';
 import { useBlockSelector } from '@/hooks/use-block';
 
 export function Chat({
   id,
   initialMessages,
   selectedModelId,
-  selectedVisibilityType,
+  selectedModeType,
   isReadonly,
 }: {
   id: string;
   initialMessages: Array<Message>;
   selectedModelId: string;
-  selectedVisibilityType: VisibilityType;
+  selectedModeType: ModeType;
   isReadonly: boolean;
 }) {
   const { mutate } = useSWRConfig();
@@ -65,7 +65,7 @@ export function Chat({
         <ChatHeader
           chatId={id}
           selectedModelId={selectedModelId}
-          selectedVisibilityType={selectedVisibilityType}
+          selectedModeType={selectedModeType}
           isReadonly={isReadonly}
         />
 
@@ -94,6 +94,7 @@ export function Chat({
               messages={messages}
               setMessages={setMessages}
               append={append}
+              selectedModeType={selectedModeType}
             />
           )}
         </form>

@@ -10,12 +10,11 @@ import useSWR from 'swr';
 
 import {
   CheckCircleFillIcon,
-  GlobeIcon,
-  LockIcon,
   MoreHorizontalIcon,
   ShareIcon,
   TrashIcon,
 } from '@/components/icons';
+import { Siren, BookOpen } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,7 +47,7 @@ import {
 } from '@/components/ui/sidebar';
 import type { Chat } from '@/lib/db/schema';
 import { fetcher } from '@/lib/utils';
-import { useChatVisibility } from '@/hooks/use-chat-visibility';
+import { useChatMode } from '@/hooks/use-chat-mode';
 
 type GroupedChats = {
   today: Chat[];
@@ -69,9 +68,9 @@ const PureChatItem = ({
   onDelete: (chatId: string) => void;
   setOpenMobile: (open: boolean) => void;
 }) => {
-  const { visibilityType, setVisibilityType } = useChatVisibility({
+  const { modeType, setModeType } = useChatMode({
     chatId: chat.id,
-    initialVisibility: chat.visibility,
+    initialMode: chat.mode as any,
   });
 
   return (
@@ -104,28 +103,28 @@ const PureChatItem = ({
                 <DropdownMenuItem
                   className="cursor-pointer flex-row justify-between"
                   onClick={() => {
-                    setVisibilityType('private');
+                    setModeType('ilkyardim');
                   }}
                 >
                   <div className="flex flex-row gap-2 items-center">
-                    <LockIcon size={12} />
-                    <span>Private</span>
+                    <Siren size={14} />
+                    <span>İlkyardım Modu</span>
                   </div>
-                  {visibilityType === 'private' ? (
+                  {modeType === 'ilkyardim' ? (
                     <CheckCircleFillIcon />
                   ) : null}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer flex-row justify-between"
                   onClick={() => {
-                    setVisibilityType('public');
+                    setModeType('egitim');
                   }}
                 >
                   <div className="flex flex-row gap-2 items-center">
-                    <GlobeIcon />
-                    <span>Public</span>
+                    <BookOpen size={14} />
+                    <span>Eğitim Modu</span>
                   </div>
-                  {visibilityType === 'public' ? <CheckCircleFillIcon /> : null}
+                  {modeType === 'egitim' ? <CheckCircleFillIcon /> : null}
                 </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuPortal>

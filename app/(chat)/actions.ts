@@ -7,9 +7,9 @@ import { customModel } from '@/lib/ai';
 import {
   deleteMessagesByChatIdAfterTimestamp,
   getMessageById,
-  updateChatVisiblityById,
+  updateChatModeById,
 } from '@/lib/db/queries';
-import { VisibilityType } from '@/components/visibility-selector';
+import type { ModeType } from '@/lib/mode';
 
 export async function saveModelId(model: string) {
   const cookieStore = await cookies();
@@ -43,12 +43,12 @@ export async function deleteTrailingMessages({ id }: { id: string }) {
   });
 }
 
-export async function updateChatVisibility({
+export async function updateChatMode({
   chatId,
-  visibility,
+  mode,
 }: {
   chatId: string;
-  visibility: VisibilityType;
+  mode: ModeType;
 }) {
-  await updateChatVisiblityById({ chatId, visibility });
+  await updateChatModeById({ chatId, mode });
 }

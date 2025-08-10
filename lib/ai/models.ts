@@ -9,17 +9,23 @@ export interface Model {
 
 export const models: Array<Model> = [
   {
-    id: 'gpt-4o-mini',
-    label: 'GPT 4o mini',
-    apiIdentifier: 'gpt-4o-mini',
-    description: 'Small model for fast, lightweight tasks',
+    id: 'gemma3-1b',
+    label: 'gemma3-1b',
+    apiIdentifier: 'gemma3-1b',
+    description: 'Daha küçük ve hızlı bir model',
   },
   {
-    id: 'gpt-4o',
-    label: 'GPT 4o',
-    apiIdentifier: 'gpt-4o',
-    description: 'For complex, multi-step tasks',
+    id: 'gemma3-4b',
+    label: 'gemma3-4b',
+    apiIdentifier: 'gemma3-4b',
+    description: 'Orta boyutlu bir model',
+  },
+  {
+    id: 'gemma3-12b',
+    label: 'gemma3-12b',
+    apiIdentifier: 'gemma3-3b',
+    description: 'Daha büyük ve daha güçlü bir model',
   },
 ] as const;
 
-export const DEFAULT_MODEL_NAME: string = 'gpt-4o-mini';
+export const DEFAULT_MODEL_NAME: string = 'gemma3-1b';

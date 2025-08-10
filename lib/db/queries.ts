@@ -319,17 +319,17 @@ export async function deleteMessagesByChatIdAfterTimestamp({
   }
 }
 
-export async function updateChatVisiblityById({
+export async function updateChatModeById({
   chatId,
-  visibility,
+  mode,
 }: {
   chatId: string;
-  visibility: 'private' | 'public';
+  mode: 'ilkyardim' | 'egitim';
 }) {
   try {
-    return await db.update(chat).set({ visibility }).where(eq(chat.id, chatId));
+    return await db.update(chat).set({ mode }).where(eq(chat.id, chatId));
   } catch (error) {
-    console.error('Failed to update chat visibility in database');
+    console.error('Failed to update chat mode in database');
     throw error;
   }
 }

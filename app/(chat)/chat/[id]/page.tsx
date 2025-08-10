@@ -19,7 +19,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 
   const session = await auth();
 
-  if (chat.visibility === 'private') {
+  if (chat.mode === 'ilkyardim') {
     if (!session || !session.user) {
       return notFound();
     }
@@ -45,7 +45,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         id={chat.id}
         initialMessages={convertToUIMessages(messagesFromDb)}
         selectedModelId={selectedModelId}
-        selectedVisibilityType={chat.visibility}
+        selectedModeType={chat.mode as any}
         isReadonly={session?.user?.id !== chat.userId}
       />
       <DataStreamHandler id={id} />
