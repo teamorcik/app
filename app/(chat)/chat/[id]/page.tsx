@@ -12,22 +12,16 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const { id } = params;
   const chat = await getChatById({ id });
-
-  if (!chat) {
-    notFound();
-  }
+  // Do not 404 if chat doesn't exist yet. This avoids a race during first message
+  // where the client updates the URL before the chat is saved server-side.
 
   const session = await auth();
-
-  if (chat.mode === 'ilkyardim') {
-    if (!session || !session.user) {
-      return notFound();
-    }
-
-    if (session.user.id !== chat.userId) {
-      return notFound();
-    }
-  }
+  const isOwner = !!session?.user?.id && session?.user?.id === chat?.userId;
+  const isReadonly = chat
+    ? chat.mode === 'ilkyardim'
+      ? !isOwner
+      : session?.user?.id !== chat.userId
+    : false;
 
   const messagesFromDb = await getMessagesByChatId({
     id,
@@ -42,11 +36,11 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   return (
     <>
       <Chat
-        id={chat.id}
+        id={chat?.id ?? id}
         initialMessages={convertToUIMessages(messagesFromDb)}
         selectedModelId={selectedModelId}
-        selectedModeType={chat.mode as any}
-        isReadonly={session?.user?.id !== chat.userId}
+        selectedModeType={(chat?.mode as any) ?? 'ilkyardim'}
+        isReadonly={isReadonly}
       />
       <DataStreamHandler id={id} />
     </>

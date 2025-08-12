@@ -9,23 +9,23 @@ export interface Model {
 
 export const models: Array<Model> = [
   {
-    id: 'gemma3-1b',
+    id: 'gemma3:1b',
     label: 'gemma3-1b',
-    apiIdentifier: 'gemma3-1b',
+    apiIdentifier: 'gemma3:1b',
     description: 'Daha küçük ve hızlı bir model',
   },
   {
-    id: 'gemma3-4b',
+    id: 'gemma3:4b',
     label: 'gemma3-4b',
-    apiIdentifier: 'gemma3-4b',
+    apiIdentifier: 'gemma3:4b',
     description: 'Orta boyutlu bir model',
   },
   {
-    id: 'gemma3-12b',
+    id: 'gemma3:12b',
     label: 'gemma3-12b',
-    apiIdentifier: 'gemma3-3b',
+    apiIdentifier: 'gemma3:12b',
     description: 'Daha büyük ve daha güçlü bir model',
   },
 ] as const;
 
-export const DEFAULT_MODEL_NAME: string = 'gemma3-1b';
+export const DEFAULT_MODEL_NAME: string = 'gemma3:1b';
