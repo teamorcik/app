@@ -37,3 +37,14 @@ yarn-error.log*
 .vercel
 .vscode
 .env*.local
+
+# RAG System - Vector Database and Documents
+data/
+documents/
+*.db
+*.sqlite
+*.sqlite3
+
+# ChromaDB (if used)
+chroma/
+
