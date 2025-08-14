@@ -1,0 +1,13 @@
+[
+  {
+    "id": "sample-1",
+    "title": "Temel Yaşam Desteği (Örnek)",
+    "url": "https://example.org/docs/tyd",
+    "chunk": "Acil durumda önce güvenliği sağlayın. Bilinç kontrolü yapın, solunumu kontrol edin ve acil çağrı yapın (112).",
+    "embedding": [
+      0,
+      0,
+      0
+    ]
+  }
+]

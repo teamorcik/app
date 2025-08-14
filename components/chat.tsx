@@ -41,13 +41,20 @@ export function Chat({
     stop,
     reload,
   } = useChat({
-    api: `/api/chat`,
+    api: `/api/chat-rag`,
     id,
     body: { id, selectedChatModel: selectedModelId },
     initialMessages,
     experimental_throttle: 100,
     onFinish: () => {
+      console.log('Chat finished successfully');
       mutate('/api/history');
+    },
+    onError: (error) => {
+      console.error('Chat error:', error);
+    },
+    onResponse: (response) => {
+      console.log('Chat response received:', response);
     },
   });
 

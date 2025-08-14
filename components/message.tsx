@@ -136,6 +136,30 @@ const PurePreviewMessage = ({
                       <div key={toolCallId}>
                         {toolName === 'getWeather' ? (
                           <Weather weatherAtLocation={result} />
+                        ) : toolName === 'firstaid-image' ? (
+                          <div className="flex flex-col gap-2">
+                            <img
+                              src={result?.best?.cdn}
+                              alt={result?.best?.file ?? 'first aid image'}
+                              className="rounded-md max-h-64 w-auto"
+                            />
+                            {result?.alternatives?.length > 0 && (
+                              <div className="text-xs text-muted-foreground">
+                                Alternatifler: {result.alternatives.length}
+                              </div>
+                            )}
+                          </div>
+                        ) : toolName === 'firstaid-video' ? (
+                          <div className="flex flex-col gap-2">
+                            <a
+                              href={result?.best?.cdn}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-blue-500 underline"
+                            >
+                              YouTube videosu: {result?.best?.file ?? 'İzle'}
+                            </a>
+                          </div>
                         ) : toolName === 'createDocument' ? (
                           <DocumentPreview
                             isReadonly={isReadonly}
@@ -168,6 +192,10 @@ const PurePreviewMessage = ({
                     >
                       {toolName === 'getWeather' ? (
                         <Weather />
+                      ) : toolName === 'firstaid-image' ? (
+                        <div className="h-40 w-full bg-muted rounded-md" />
+                      ) : toolName === 'firstaid-video' ? (
+                        <div className="h-6 w-48 bg-muted rounded" />
                       ) : toolName === 'createDocument' ? (
                         <DocumentPreview isReadonly={isReadonly} args={args} />
                       ) : toolName === 'updateDocument' ? (

@@ -25,10 +25,14 @@ export async function generateTitleFromUserMessage({
   const { text: title } = await generateText({
     model: customModel(DEFAULT_MODEL_NAME),
     system: `\n
-    - you will generate a short title based on the first message a user begins a conversation with
-    - ensure it is not more than 80 characters long
-    - the title should be a summary of the user's message
-    - do not use quotes or colons`,
+    * Kullanıcı bir konuşmaya başladığında, ilk mesajına göre kısa bir başlık oluştur
+* Başlık 80 karakterden uzun olmamalı
+* Başlık, kullanıcının mesajının özeti olmalı
+* Tırnak işareti veya iki nokta kullanılmamalı
+* Başlık dışında başka hiçbir şey söyleme
+* Başlıkta başlık dışında başka karakter kullanma
+* Markdown kullanma
+`,
     prompt: JSON.stringify(message),
   });
 
