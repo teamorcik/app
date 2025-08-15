@@ -2,7 +2,8 @@ import { type CoreMessage, type Message, createDataStreamResponse, smoothStream,
 
 import { auth } from '@/app/(auth)/auth';
 import { openai } from '@/lib/ai/provider';
-import { systemPrompt } from '@/lib/ai/prompts';
+import { getSystemPromptForMode } from '@/lib/ai/prompts';
+import type { ModeType } from '@/lib/mode';
 import {
   deleteChatById,
   getChatById,
@@ -10,6 +11,12 @@ import {
   saveMessages,
 } from '@/lib/db/queries';
 import { generateUUID, getMostRecentUserMessage } from '@/lib/utils';
+
+// UUID validation function
+function isValidUUID(str: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+}
 
 import { generateTitleFromUserMessage } from '../../actions';
 
@@ -20,25 +27,30 @@ export async function POST(request: Request) {
     id,
     messages,
     selectedChatModel,
-  }: { id: string; messages: Array<Message>; selectedChatModel: string } =
-    await request.json();
+    mode,
+  }: { 
+    id: string; 
+    messages: Array<Message>; 
+    selectedChatModel: string;
+    mode?: ModeType;
+  } = await request.json();
 
   const session = await auth();
 
   if (!session || !session.user || !session.user.id) {
-    return new Response('Unauthorized', { status: 401 });
+    return new Response('Yetkisiz erişim', { status: 401 });
   }
 
   const userMessage = getMostRecentUserMessage(messages as CoreMessage[]);
 
   if (!userMessage) {
-    return new Response('No user message found', { status: 400 });
+    return new Response('Kullanıcı mesajı bulunamadı', { status: 400 });
   }
 
   let chat = await getChatById({ id });
 
   if (!chat) {
-    let title = 'New chat';
+    let title = 'Yeni sohbet';
     try {
       title = await generateTitleFromUserMessage({ message: userMessage });
     } catch (error) {
@@ -47,12 +59,19 @@ export async function POST(request: Request) {
     await saveChat({ id, userId: session.user.id, title });
   }
 
+  // Validate and fix user message ID if needed
+  // Note: CoreUserMessage doesn't have id property, so we generate a new one
+  const messageId = generateUUID();
+
   await saveMessages({
-    messages: [{ ...userMessage, id: generateUUID(), createdAt: new Date(), chatId: id }],
+    messages: [{ ...userMessage, id: messageId, createdAt: new Date(), chatId: id }],
   });
 
   return createDataStreamResponse({
     execute: (dataStream) => {
+      // Get mode-specific system prompt
+      const systemPrompt = getSystemPromptForMode(mode || 'ilkyardim');
+      
       const result = streamText({
         model: openai(selectedChatModel),
         system: systemPrompt,
@@ -64,7 +83,7 @@ export async function POST(request: Request) {
       result.mergeIntoDataStream(dataStream);
     },
     onError: () => {
-      return 'Oops, an error occured!';
+      return 'Ups, bir hata oluştu!';
     },
   });
 }

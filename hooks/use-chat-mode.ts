@@ -27,7 +27,7 @@ export function useChatMode({
   const modeType = useMemo(() => {
     if (!history) return localMode;
     const chat = history.find((chat) => chat.id === chatId);
-    if (!chat) return 'ilkyardim';
+    if (!chat) return localMode; // For new chats, use localMode instead of defaulting to 'ilkyardim'
     return chat.mode as ModeType;
   }, [history, chatId, localMode]);
 

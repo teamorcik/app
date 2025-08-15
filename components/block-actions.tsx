@@ -6,7 +6,8 @@ import { toast } from 'sonner';
 import { ConsoleOutput, UIBlock } from './block';
 import { Dispatch, memo, SetStateAction } from 'react';
 import { RunCodeButton } from './run-code-button';
-import { useMultimodalCopyToClipboard } from '@/hooks/use-multimodal-copy-to-clipboard';
+import { useCopyToClipboard } from 'usehooks-ts';
+
 
 interface BlockActionsProps {
   block: UIBlock;
@@ -25,8 +26,7 @@ function PureBlockActions({
   mode,
   setConsoleOutputs,
 }: BlockActionsProps) {
-  const { copyTextToClipboard, copyImageToClipboard } =
-    useMultimodalCopyToClipboard();
+  const { copyTextToClipboard } = useCopyToClipboard();
 
   return (
     <div className="flex flex-row gap-1">

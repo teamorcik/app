@@ -9,15 +9,15 @@ export interface Model {
 
 export const models: Array<Model> = [
   {
-    id: 'gemma3:1b',
-    label: 'gemma3-1b',
-    apiIdentifier: 'gemma3:1b',
+    id: 'Orcik23/orcik:1b',
+    label: 'orcik-1b',
+    apiIdentifier: 'Orcik23/orcik:1b',
     description: 'Daha küçük ve hızlı bir model',
   },
   {
-    id: 'gemma3:4b',
-    label: 'gemma3-4b',
-    apiIdentifier: 'gemma3:4b',
+    id: 'Orcik23/orcik:4b',
+    label: 'orcik-4b',
+    apiIdentifier: 'Orcik23/orcik:4b',
     description: 'Orta boyutlu bir model',
   },
   {
@@ -28,4 +28,4 @@ export const models: Array<Model> = [
   },
 ] as const;
 
-export const DEFAULT_MODEL_NAME: string = 'gemma3:1b';
+export const DEFAULT_MODEL_NAME: string = 'Orcik23/orcik:4b';

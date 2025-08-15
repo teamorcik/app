@@ -46,13 +46,13 @@ export function PureMessageActions({
               variant="outline"
               onClick={async () => {
                 await copyToClipboard(message.content as string);
-                toast.success('Copied to clipboard!');
+                toast.success('Panoya kopyalandı!');
               }}
             >
               <CopyIcon />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Copy</TooltipContent>
+          <TooltipContent>Kopyala</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -74,7 +74,7 @@ export function PureMessageActions({
                 });
 
                 toast.promise(upvote, {
-                  loading: 'Upvoting Response...',
+                  loading: 'Yanıt beğeniliyor...',
                   success: () => {
                     mutate<Array<Vote>>(
                       `/api/vote?chatId=${chatId}`,
@@ -97,16 +97,16 @@ export function PureMessageActions({
                       { revalidate: false },
                     );
 
-                    return 'Upvoted Response!';
+                    return 'Yanıt beğenildi!';
                   },
-                  error: 'Failed to upvote response.',
+                  error: 'Yanıt beğenilemedi.',
                 });
               }}
             >
               <ThumbUpIcon />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Upvote Response</TooltipContent>
+          <TooltipContent>Yanıtı Beğen</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -128,7 +128,7 @@ export function PureMessageActions({
                 });
 
                 toast.promise(downvote, {
-                  loading: 'Downvoting Response...',
+                  loading: 'Yanıt beğenilmiyor...',
                   success: () => {
                     mutate<Array<Vote>>(
                       `/api/vote?chatId=${chatId}`,
@@ -151,16 +151,16 @@ export function PureMessageActions({
                       { revalidate: false },
                     );
 
-                    return 'Downvoted Response!';
+                    return 'Yanıt beğenilmedi!';
                   },
-                  error: 'Failed to downvote response.',
+                  error: 'Yanıt beğenme işlemi başarısız.',
                 });
               }}
             >
               <ThumbDownIcon />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Downvote Response</TooltipContent>
+          <TooltipContent>Yanıtı Beğenme</TooltipContent>
         </Tooltip>
       </div>
     </TooltipProvider>

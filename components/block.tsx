@@ -1,5 +1,4 @@
 import type {
-  Attachment,
   ChatRequestOptions,
   CreateMessage,
   Message,
@@ -23,7 +22,7 @@ import { cn, fetcher } from '@/lib/utils';
 import { DiffView } from './diffview';
 import { DocumentSkeleton } from './document-skeleton';
 import { Editor } from './editor';
-import { MultimodalInput } from './multimodal-input';
+import { ChatInput } from './chat-input';
 import { Toolbar } from './toolbar';
 import { VersionFooter } from './version-footer';
 import { BlockActions } from './block-actions';
@@ -71,8 +70,6 @@ function PureBlock({
   handleSubmit,
   isLoading,
   stop,
-  attachments,
-  setAttachments,
   append,
   messages,
   setMessages,
@@ -85,8 +82,6 @@ function PureBlock({
   setInput: (input: string) => void;
   isLoading: boolean;
   stop: () => void;
-  attachments: Array<Attachment>;
-  setAttachments: Dispatch<SetStateAction<Array<Attachment>>>;
   messages: Array<Message>;
   setMessages: Dispatch<SetStateAction<Array<Message>>>;
   votes: Array<Vote> | undefined;
@@ -338,19 +333,18 @@ function PureBlock({
                 />
 
                 <form className="flex flex-row gap-2 relative items-end w-full px-4 pb-4">
-                  <MultimodalInput
+                  <ChatInput
                     chatId={chatId}
                     input={input}
                     setInput={setInput}
                     handleSubmit={handleSubmit}
                     isLoading={isLoading}
                     stop={stop}
-                    attachments={attachments}
-                    setAttachments={setAttachments}
                     messages={messages}
                     append={append}
                     className="bg-background dark:bg-muted"
                     setMessages={setMessages}
+                    selectedModeType="chat"
                   />
                 </form>
               </div>

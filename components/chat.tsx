@@ -1,8 +1,7 @@
 'use client';
 
-import type { Attachment, Message } from 'ai';
+import type { Message } from 'ai';
 import { useChat } from 'ai/react';
-import { useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 
 import { ChatHeader } from '@/components/chat-header';
@@ -10,10 +9,11 @@ import type { Vote } from '@/lib/db/schema';
 import { fetcher } from '@/lib/utils';
 
 import { Block } from './block';
-import { MultimodalInput } from './multimodal-input';
+import { ChatInput } from './chat-input';
 import { Messages } from './messages';
 import type { ModeType } from '@/lib/mode';
 import { useBlockSelector } from '@/hooks/use-block';
+import { useChatMode } from '@/hooks/use-chat-mode';
 
 export function Chat({
   id,
@@ -30,6 +30,15 @@ export function Chat({
 }) {
   const { mutate } = useSWRConfig();
 
+  // Get the current mode from the hook (this updates when user switches modes)
+  const { modeType } = useChatMode({
+    chatId: id,
+    initialMode: selectedModeType,
+  });
+
+  // Route to different API endpoints based on current mode
+  const apiEndpoint = modeType === 'ilkyardim' ? '/api/chat-rag' : '/api/chat-open';
+
   const {
     messages,
     setMessages,
@@ -41,13 +50,30 @@ export function Chat({
     stop,
     reload,
   } = useChat({
-    api: `/api/chat-rag`,
-    id,
-    body: { id, selectedChatModel: selectedModelId },
+    api: apiEndpoint,
+    id: `${id}-${modeType}`, // Add mode to ID to restart chat when mode changes
+    body: { id, selectedChatModel: selectedModelId, mode: modeType },
     initialMessages,
     experimental_throttle: 100,
-    onFinish: () => {
-      console.log('Chat finished successfully');
+    onFinish: async (message) => {
+      console.log('Chat finished successfully', message);
+      
+      // Save the assistant message to database
+      try {
+        await fetch('/api/save-messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chatId: id,
+            messages: [message],
+          }),
+        });
+      } catch (error) {
+        console.error('Failed to save assistant message:', error);
+      }
+      
       mutate('/api/history');
     },
     onError: (error) => {
@@ -63,7 +89,6 @@ export function Chat({
     fetcher,
   );
 
-  const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const isBlockVisible = useBlockSelector((state) => state.isVisible);
 
   return (
@@ -72,7 +97,7 @@ export function Chat({
         <ChatHeader
           chatId={id}
           selectedModelId={selectedModelId}
-          selectedModeType={selectedModeType}
+          selectedModeType={modeType}
           isReadonly={isReadonly}
         />
 
@@ -89,19 +114,17 @@ export function Chat({
 
         <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
           {!isReadonly && (
-            <MultimodalInput
+            <ChatInput
               chatId={id}
               input={input}
               setInput={setInput}
               handleSubmit={handleSubmit}
               isLoading={isLoading}
               stop={stop}
-              attachments={attachments}
-              setAttachments={setAttachments}
               messages={messages}
               setMessages={setMessages}
               append={append}
-              selectedModeType={selectedModeType}
+              selectedModeType={modeType}
             />
           )}
         </form>
@@ -114,8 +137,6 @@ export function Chat({
         handleSubmit={handleSubmit}
         isLoading={isLoading}
         stop={stop}
-        attachments={attachments}
-        setAttachments={setAttachments}
         append={append}
         messages={messages}
         setMessages={setMessages}

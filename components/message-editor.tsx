@@ -7,6 +7,7 @@ import { Textarea } from './ui/textarea';
 import { deleteTrailingMessages } from '@/app/(chat)/actions';
 import { toast } from 'sonner';
 import { useUserMessageId } from '@/hooks/use-user-message-id';
+import { generateUUID } from '@/lib/utils';
 
 export type MessageEditorProps = {
   message: Message;
@@ -74,35 +75,49 @@ export function MessageEditor({
           disabled={isSubmitting}
           onClick={async () => {
             setIsSubmitting(true);
-            const messageId = userMessageIdFromServer ?? message.id;
+            
+            // UUID validation function
+            const isValidUUID = (str: string): boolean => {
+              const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+              return uuidRegex.test(str);
+            };
 
-            if (!messageId) {
-              toast.error('Something went wrong, please try again!');
-              setIsSubmitting(false);
-              return;
+            // Ensure we have a valid UUID for the message ID
+            let messageId = userMessageIdFromServer ?? message.id;
+            if (!messageId || !isValidUUID(messageId)) {
+              messageId = generateUUID();
+              console.log(`Generated new UUID for message editing: ${message.id} -> ${messageId}`);
             }
 
-            await deleteTrailingMessages({
-              id: messageId,
-            });
+            try {
+              await deleteTrailingMessages({
+                id: messageId,
+              });
 
-            setMessages((messages) => {
-              const index = messages.findIndex((m) => m.id === message.id);
+              setMessages((messages) => {
+                const index = messages.findIndex((m) => m.id === message.id);
 
-              if (index !== -1) {
-                const updatedMessage = {
-                  ...message,
-                  content: draftContent,
-                };
+                if (index !== -1) {
+                  const updatedMessage = {
+                    ...message,
+                    id: messageId, // Use the validated/generated UUID
+                    content: draftContent,
+                  };
 
-                return [...messages.slice(0, index), updatedMessage];
-              }
+                  return [...messages.slice(0, index), updatedMessage];
+                }
 
-              return messages;
-            });
+                return messages;
+              });
 
-            setMode('view');
-            reload();
+              setMode('view');
+              reload();
+            } catch (error) {
+              console.error('Error in message editing:', error);
+              toast.error('Failed to update message. Please try again.');
+            } finally {
+              setIsSubmitting(false);
+            }
           }}
         >
           {isSubmitting ? 'Sending...' : 'Send'}

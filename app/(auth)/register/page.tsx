@@ -25,14 +25,14 @@ export default function Page() {
 
   useEffect(() => {
     if (state.status === 'user_exists') {
-      toast.error('Account already exists');
+      toast.error('Hesap zaten mevcut');
     } else if (state.status === 'failed') {
       console.log(state);
-      toast.error('Failed to create account');
+      toast.error('Hesap oluşturulamadı');
     } else if (state.status === 'invalid_data') {
-      toast.error('Failed validating your submission!');
+      toast.error('Gönderiminiz doğrulanamadı!');
     } else if (state.status === 'success') {
-      toast.success('Account created successfully');
+      toast.success('Hesap başarıyla oluşturuldu');
       setIsSuccessful(true);
       router.refresh();
     }
@@ -47,22 +47,22 @@ export default function Page() {
     <div className="flex h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
       <div className="w-full max-w-md overflow-hidden rounded-2xl gap-12 flex flex-col">
         <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
-          <h3 className="text-xl font-semibold dark:text-zinc-50">Sign Up</h3>
+          <h3 className="text-xl font-semibold dark:text-zinc-50">Kayıt Ol</h3>
           <p className="text-sm text-gray-500 dark:text-zinc-400">
-            Create an account with your email and password
+            E-posta ve şifrenizle hesap oluşturun
           </p>
         </div>
         <AuthForm action={handleSubmit} defaultEmail={email}>
-          <SubmitButton isSuccessful={isSuccessful}>Sign Up</SubmitButton>
+          <SubmitButton isSuccessful={isSuccessful}>Kayıt Ol</SubmitButton>
           <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
-            {'Already have an account? '}
+            {'Zaten hesabınız var mı? '}
             <Link
               href="/login"
               className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
             >
-              Sign in
+              Giriş yapın
             </Link>
-            {' instead.'}
+            {'.'}
           </p>
         </AuthForm>
       </div>

@@ -24,6 +24,6 @@ export const RAG_CONFIG = {
   CHUNK_OVERLAP: 50,
   
   // Search settings
-  TOP_K: 5,
-  MIN_SIMILARITY_SCORE: 0.7,
+  TOP_K: 7,
+  MIN_SIMILARITY_SCORE: 0.6,
 } as const;

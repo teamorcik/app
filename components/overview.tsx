@@ -20,31 +20,18 @@ export const Overview = () => {
           <MessageIcon size={32} />
         </p>
         <p>
-          This is an{' '}
+          Bu, İlk Yardım konularında yardım sağlamak için özel olarak tasarlanmış bir{' '}
           <Link
             className="font-medium underline underline-offset-4"
             href="https://github.com/vercel/ai-chatbot"
             target="_blank"
           >
-            open source
+            açık kaynak
           </Link>{' '}
-          chatbot template built with Next.js and the AI SDK by Vercel. It uses
-          the{' '}
-          <code className="rounded-md bg-muted px-1 py-0.5">streamText</code>{' '}
-          function in the server and the{' '}
-          <code className="rounded-md bg-muted px-1 py-0.5">useChat</code> hook
-          on the client to create a seamless chat experience.
+          sohbet asistanıdır. Next.js ve Vercel AI SDK kullanılarak oluşturulmuştur.
         </p>
         <p>
-          You can learn more about the AI SDK by visiting the{' '}
-          <Link
-            className="font-medium underline underline-offset-4"
-            href="https://sdk.vercel.ai/docs"
-            target="_blank"
-          >
-            docs
-          </Link>
-          .
+          Acil durumlarda profesyonel tıbbi yardım almayı unutmayın. Bu asistan sadece bilgilendirme amaçlıdır.
         </p>
       </div>
     </motion.div>

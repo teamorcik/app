@@ -25,13 +25,13 @@ const modes: Array<{
   {
     id: 'ilkyardim',
     label: 'İlkyardım Modu',
-    description: 'Only you can access this chat',
+    description: 'Acil durumlar için hızlı ve kısa cevaplar (belgelerle desteklenir)',
     icon: <Siren size={16} />,
   },
   {
     id: 'egitim',
     label: 'Eğitim Modu',
-    description: 'Anyone with the link can access this chat',
+    description: 'Detaylı eğitim içerikleri ve açıklamalar',
     icon: <BookOpen size={16} />,
   },
 ];

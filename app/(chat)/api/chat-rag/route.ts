@@ -2,7 +2,7 @@ import { type CoreMessage, type Message, createDataStreamResponse, smoothStream,
 
 import { auth } from '@/app/(auth)/auth';
 import { openai } from '@/lib/ai/provider';
-import { systemPrompt } from '@/lib/ai/prompts';
+import { getSystemPromptForMode } from '@/lib/ai/prompts';
 import { DocumentSearch } from '@/lib/rag/search';
 import {
   deleteChatById,
@@ -11,9 +11,16 @@ import {
   saveMessages,
 } from '@/lib/db/queries';
 import { generateUUID, getMostRecentUserMessage } from '@/lib/utils';
+import type { ModeType } from '@/lib/mode';
+
+// UUID validation function
+function isValidUUID(str: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+}
 
 import { generateTitleFromUserMessage } from '../../actions';
-import { BlobServiceRateLimited } from '@vercel/blob';
+
 
 export const maxDuration = 60;
 
@@ -24,25 +31,30 @@ export async function POST(request: Request) {
     id,
     messages,
     selectedChatModel,
-  }: { id: string; messages: Array<Message>; selectedChatModel: string } =
-    await request.json();
+    mode,
+  }: { 
+    id: string; 
+    messages: Array<Message>; 
+    selectedChatModel: string;
+    mode?: ModeType;
+  } = await request.json();
 
   const session = await auth();
 
   if (!session || !session.user || !session.user.id) {
-    return new Response('Unauthorized', { status: 401 });
+    return new Response('Yetkisiz erişim', { status: 401 });
   }
 
   const userMessage = getMostRecentUserMessage(messages as CoreMessage[]);
 
   if (!userMessage) {
-    return new Response('No user message found', { status: 400 });
+    return new Response('Kullanıcı mesajı bulunamadı', { status: 400 });
   }
 
   let chat = await getChatById({ id });
 
   if (!chat) {
-    let title = 'New chat';
+    let title = 'Yeni sohbet';
     try {
       title = await generateTitleFromUserMessage({ message: userMessage });
     } catch (error) {
@@ -51,37 +63,50 @@ export async function POST(request: Request) {
     await saveChat({ id, userId: session.user.id, title });
   }
 
+  // Validate and fix user message ID if needed
+  // Note: CoreUserMessage doesn't have id property, so we generate a new one
+  const messageId = generateUUID();
+
   await saveMessages({
-    messages: [{ ...userMessage, id: generateUUID(), createdAt: new Date(), chatId: id }],
+    messages: [{ ...userMessage, id: messageId, createdAt: new Date(), chatId: id }],
   });
 
   return createDataStreamResponse({
     execute: async (dataStream) => {
+      // Get mode-specific system prompt
+      const baseSystemPrompt = getSystemPromptForMode(mode || 'ilkyardim');
+      
       try {
         // Get relevant context from documents
         const relevantContext = await documentSearch.getRelevantContext(userMessage.content as string);
         
         // Enhanced system prompt with RAG context
-        let enhancedSystemPrompt = systemPrompt;
+        let enhancedSystemPrompt = baseSystemPrompt;
         
         if (relevantContext) {
-          enhancedSystemPrompt = `${systemPrompt}
+          enhancedSystemPrompt = `${baseSystemPrompt}
 
-## İlgili Belgelerden Bilgiler
+═══════════════════════════════════════════════════════════════
+## 📚 İLK YARDIM BELGELERİNDEN ALINAN BİLGİLER
+═══════════════════════════════════════════════════════════════
 
-Aşağıda kullanıcının sorusuyla ilgili ilk yardım belgelerinden alınan bilgiler bulunmaktadır. Bu bilgileri kullanarak doğru ve güvenilir cevaplar verin:
+Aşağıdaki bilgiler kullanıcının sorusuyla doğrudan ilgili olan ilk yardım belgelerinden alınmıştır. Bu bilgileri MUTLAKA cevabınızın temelini oluşturmak için kullanın:
 
 ${relevantContext}
 
-## Önemli Notlar
-- Yukarıdaki belgelerden alınan bilgileri kullanın
-- Belge kaynaklarını belirtin
-- Eğer sorulan soru belgelerle ilgili değilse, bu durumu kullanıcıya belirtin
-- İlk yardım konularında her zaman güvenlik ve doğruluk önceliklidir
--cevapında kaynakları Belirtme`;
+═══════════════════════════════════════════════════════════════
+## ⚠️ ÖNEMLI TALİMATLAR
+═══════════════════════════════════════════════════════════════
+
+- MUTLAKA yukarıdaki belge içeriklerini kullanarak cevap verin
+- Belgelerden alınan bilgileri TAM OLARAK aktarın, kısaltmayın
+- Belgelerden referans alarak kapsamlı açıklamalar yapın  
+- Adım adım prosedürleri belgelerden alıntılayarak detaylandırın
+- Bu belgeler sizin birincil bilgi kaynağınızdır
+- Cevabınızı bu belgelerden alınan bilgilerle destekleyin`;
 
         } else {
-          enhancedSystemPrompt = `${systemPrompt}
+          enhancedSystemPrompt = `${baseSystemPrompt}
 
 ## İlk Yardım Asistanı
 Bu sohbette ilk yardım belgelerinizde ilgili bilgi bulunamadı. Genel ilk yardım bilgilerimi kullanarak yardımcı olmaya çalışacağım, ancak acil durumlarda 112'yi arayın ve tıbbi personelden yardım alın.`;
@@ -102,7 +127,7 @@ Bu sohbette ilk yardım belgelerinizde ilgili bilgi bulunamadı. Genel ilk yard�
         // Fallback to regular chat if RAG fails
         const result = streamText({
           model: openai(selectedChatModel),
-          system: systemPrompt + '\n\n(Not: Belgelerden bilgi alınamadı, genel bilgilerle yanıtlıyorum)',
+          system: baseSystemPrompt + '\n\n(Not: Belgelerden bilgi alınamadı, genel bilgilerle yanıtlıyorum)',
           messages,
           maxSteps: 5,
           experimental_transform: smoothStream({ chunking: 'word' }),

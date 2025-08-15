@@ -40,12 +40,24 @@ export async function generateTitleFromUserMessage({
 }
 
 export async function deleteTrailingMessages({ id }: { id: string }) {
-  const [message] = await getMessageById({ id });
+  try {
+    const messages = await getMessageById({ id });
+    
+    if (!messages || messages.length === 0) {
+      console.warn(`No message found with ID: ${id}`);
+      return;
+    }
+    
+    const [message] = messages;
 
-  await deleteMessagesByChatIdAfterTimestamp({
-    chatId: message.chatId,
-    timestamp: message.createdAt,
-  });
+    await deleteMessagesByChatIdAfterTimestamp({
+      chatId: message.chatId,
+      timestamp: message.createdAt,
+    });
+  } catch (error) {
+    console.error('Error in deleteTrailingMessages:', error);
+    throw error;
+  }
 }
 
 export async function updateChatMode({

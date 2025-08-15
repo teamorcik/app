@@ -11,10 +11,9 @@ import useSWR from 'swr';
 import {
   CheckCircleFillIcon,
   MoreHorizontalIcon,
-  ShareIcon,
   TrashIcon,
 } from '@/components/icons';
-import { Siren, BookOpen } from 'lucide-react';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,11 +28,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -47,7 +41,7 @@ import {
 } from '@/components/ui/sidebar';
 import type { Chat } from '@/lib/db/schema';
 import { fetcher } from '@/lib/utils';
-import { useChatMode } from '@/hooks/use-chat-mode';
+
 
 type GroupedChats = {
   today: Chat[];
@@ -68,10 +62,6 @@ const PureChatItem = ({
   onDelete: (chatId: string) => void;
   setOpenMobile: (open: boolean) => void;
 }) => {
-  const { modeType, setModeType } = useChatMode({
-    chatId: chat.id,
-    initialMode: chat.mode as any,
-  });
 
   return (
     <SidebarMenuItem>
@@ -88,54 +78,17 @@ const PureChatItem = ({
             showOnHover={!isActive}
           >
             <MoreHorizontalIcon />
-            <span className="sr-only">More</span>
+            <span className="sr-only">Daha Fazla</span>
           </SidebarMenuAction>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent side="bottom" align="end">
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger className="cursor-pointer">
-              <ShareIcon />
-              <span>Share</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem
-                  className="cursor-pointer flex-row justify-between"
-                  onClick={() => {
-                    setModeType('ilkyardim');
-                  }}
-                >
-                  <div className="flex flex-row gap-2 items-center">
-                    <Siren size={14} />
-                    <span>İlkyardım Modu</span>
-                  </div>
-                  {modeType === 'ilkyardim' ? (
-                    <CheckCircleFillIcon />
-                  ) : null}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="cursor-pointer flex-row justify-between"
-                  onClick={() => {
-                    setModeType('egitim');
-                  }}
-                >
-                  <div className="flex flex-row gap-2 items-center">
-                    <BookOpen size={14} />
-                    <span>Eğitim Modu</span>
-                  </div>
-                  {modeType === 'egitim' ? <CheckCircleFillIcon /> : null}
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-
           <DropdownMenuItem
             className="cursor-pointer text-destructive focus:bg-destructive/15 focus:text-destructive dark:text-red-500"
             onSelect={() => onDelete(chat.id)}
           >
             <TrashIcon />
-            <span>Delete</span>
+            <span>Sil</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -173,16 +126,16 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     });
 
     toast.promise(deletePromise, {
-      loading: 'Deleting chat...',
+      loading: 'Sohbet siliniyor...',
       success: () => {
         mutate((history) => {
           if (history) {
             return history.filter((h) => h.id !== id);
           }
         });
-        return 'Chat deleted successfully';
+        return 'Sohbet başarıyla silindi';
       },
-      error: 'Failed to delete chat',
+      error: 'Sohbet silinemedi',
     });
 
     setShowDeleteDialog(false);
@@ -197,7 +150,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
       <SidebarGroup>
         <SidebarGroupContent>
           <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
-            Login to save and revisit previous chats!
+            Önceki sohbetlerinizi kaydetmek ve yeniden ziyaret etmek için giriş yapın!
           </div>
         </SidebarGroupContent>
       </SidebarGroup>
@@ -208,7 +161,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     return (
       <SidebarGroup>
         <div className="px-2 py-1 text-xs text-sidebar-foreground/50">
-          Today
+          Bugün
         </div>
         <SidebarGroupContent>
           <div className="flex flex-col">
@@ -238,7 +191,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
       <SidebarGroup>
         <SidebarGroupContent>
           <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
-            Your conversations will appear here once you start chatting!
+            Sohbete başladığınızda konuşmalarınız burada görünecek!
           </div>
         </SidebarGroupContent>
       </SidebarGroup>
@@ -292,7 +245,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                     {groupedChats.today.length > 0 && (
                       <>
                         <div className="px-2 py-1 text-xs text-sidebar-foreground/50">
-                          Today
+                          Bugün
                         </div>
                         {groupedChats.today.map((chat) => (
                           <ChatItem
@@ -312,7 +265,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                     {groupedChats.yesterday.length > 0 && (
                       <>
                         <div className="px-2 py-1 text-xs text-sidebar-foreground/50 mt-6">
-                          Yesterday
+                          Dün
                         </div>
                         {groupedChats.yesterday.map((chat) => (
                           <ChatItem
@@ -332,7 +285,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                     {groupedChats.lastWeek.length > 0 && (
                       <>
                         <div className="px-2 py-1 text-xs text-sidebar-foreground/50 mt-6">
-                          Last 7 days
+                          Son 7 gün
                         </div>
                         {groupedChats.lastWeek.map((chat) => (
                           <ChatItem
@@ -352,7 +305,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                     {groupedChats.lastMonth.length > 0 && (
                       <>
                         <div className="px-2 py-1 text-xs text-sidebar-foreground/50 mt-6">
-                          Last 30 days
+                          Son 30 gün
                         </div>
                         {groupedChats.lastMonth.map((chat) => (
                           <ChatItem
@@ -372,7 +325,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                     {groupedChats.older.length > 0 && (
                       <>
                         <div className="px-2 py-1 text-xs text-sidebar-foreground/50 mt-6">
-                          Older
+                          Daha Eski
                         </div>
                         {groupedChats.older.map((chat) => (
                           <ChatItem
@@ -397,16 +350,15 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your
-              chat and remove it from our servers.
-            </AlertDialogDescription>
+                      <AlertDialogTitle>Emin misiniz?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Bu işlem geri alınamaz. Sohbetinizi kalıcı olarak silecek ve sunucularımızdan kaldıracaktır.
+          </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>İptal</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete}>
-              Continue
+              Devam Et
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

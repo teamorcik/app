@@ -4,17 +4,20 @@ import { motion } from 'framer-motion';
 import { Button } from './ui/button';
 import { ChatRequestOptions, CreateMessage, Message } from 'ai';
 import { memo } from 'react';
+import type { ModeType } from '@/lib/mode';
 
 interface SuggestedActionsProps {
   chatId: string;
+  selectedModeType: ModeType;
   append: (
     message: Message | CreateMessage,
     chatRequestOptions?: ChatRequestOptions,
   ) => Promise<string | null | undefined>;
 }
 
-function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
-  const suggestedActions = [
+function PureSuggestedActions({ chatId, selectedModeType, append }: SuggestedActionsProps) {
+  // First Aid Mode - Emergency focused questions
+  const firstAidActions = [
     {
       title: 'Birisi nefes alamıyorsa?',
       label: 'Ne yapmalıyım?',
@@ -36,6 +39,32 @@ function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
       action: ' Kalp krizi geçirdiğini düşündüğüm birine ne yapabilirim?',
     },
   ];
+
+  // Education Mode - Learning focused questions
+  const educationActions = [
+    {
+      title: 'İlk yardımın temel prensipleri nelerdir?',
+      label: 'Teorik bilgi',
+      action: 'İlk yardımın temel prensipleri nelerdir? Detaylı açıklayabilir misin?',
+    },
+    {
+      title: 'Yaralarını değerlendirme nasıl yapılır?',
+      label: 'Adım adım öğren',
+      action: 'Yaralarını değerlendirme nasıl yapılır? Örneklerle açıkla.',
+    },
+    {
+      title: 'Hangi durumlarda 112 aranmalı?',
+      label: 'Karar verme süreci',
+      action: 'Hangi durumlarda 112 aranmalı? Karar verme sürecini öğretir misin?',
+    },
+    {
+      title: 'İlk yardım çantasında neler olmalı?',
+      label: 'Ekipman bilgisi',
+      action: 'İlk yardım çantasında neler olmalı? Her malzemenin kullanım amacını açıkla.',
+    },
+  ];
+
+  const suggestedActions = selectedModeType === 'egitim' ? educationActions : firstAidActions;
 
   return (
     <div className="grid sm:grid-cols-2 gap-2 w-full">
