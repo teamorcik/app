@@ -21,9 +21,9 @@ export const models: Array<Model> = [
     description: 'Orta boyutlu bir model',
   },
   {
-    id: 'gemma3:12b',
-    label: 'gemma3-12b',
-    apiIdentifier: 'gemma3:12b',
+    id: 'Orcik23/orcik:12b',
+    label: 'orcik-12b',
+    apiIdentifier: 'Orcik23/orcik:12b',
     description: 'Daha büyük ve daha güçlü bir model',
   },
 ] as const;
